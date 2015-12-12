@@ -276,11 +276,20 @@ test("Routes with trailing `/` recognize", function() {
 test("Nested routes recognize", function() {
   var handler1 = { handler: 1 };
   var handler2 = { handler: 2 };
+  var handler3 = { handler: 3 };
 
   var router = new RouteRecognizer();
-  router.add([{ path: "/foo/:bar", handler: handler1 }, { path: "/baz/:bat", handler: handler2 }], { as: 'foo' });
+  router.add([
+      { path: "/foo/:bar", handler: handler1 },
+      { path: "/baz/:bat", handler: handler2 },
+      { path: "/foo/:bar/baz/:bat", handler: handler3 }
+  ], { as: 'foo' });
 
-  resultsMatch(router.recognize("/foo/1/baz/2"), [{ handler: handler1, params: { bar: "1" }, isDynamic: true }, { handler: handler2, params: { bat: "2" }, isDynamic: true }]);
+  resultsMatch(router.recognize("/foo/1/baz/2"), [
+      { handler: handler3, params: { bar: "1", bat: "2"}, isDynamic: true },
+      { handler: handler1, params: { bar: "1" }, isDynamic: true },
+      { handler: handler2, params: { bat: "2" }, isDynamic: true }
+  ]);
 
   equal(router.hasRoute('foo'), true);
   equal(router.hasRoute('bar'), false);
