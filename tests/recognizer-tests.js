@@ -276,17 +276,14 @@ test("Routes with trailing `/` recognize", function() {
 test("Nested routes recognize", function() {
   var handler1 = { handler: 1 };
   var handler2 = { handler: 2 };
-  var handler3 = { handler: 3 };
 
   var router = new RouteRecognizer();
   router.add([
       { path: "/foo/:bar", handler: handler1 },
       { path: "/baz/:bat", handler: handler2 },
-      { path: "/foo/:bar/baz/:bat", handler: handler3 }
   ], { as: 'foo' });
 
   resultsMatch(router.recognize("/foo/1/baz/2"), [
-      { handler: handler3, params: { bar: "1", bat: "2"}, isDynamic: true },
       { handler: handler1, params: { bar: "1" }, isDynamic: true },
       { handler: handler2, params: { bat: "2" }, isDynamic: true }
   ]);
@@ -458,4 +455,12 @@ test("Getting a handler for an invalid named route raises", function() {
     QUnit.throws(function() {
         router.handlersFor("nope");
     }, /There is no route named nope/);
+});
+
+test('monty test case', function() {
+    var handler = {};
+    var router = new RouteRecognizer();
+
+    router.add({ path: "/foo/:bar/baz/:bat", handler: handler });
+    resultsMatch(router.recognize("/foo/1/baz/2,3,4"), [{ handler: handler, params: { bar: "1", bat: "2,3,4"}, isDynamic: true }]);
 });
